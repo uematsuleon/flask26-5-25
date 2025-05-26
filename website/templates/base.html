@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Prevent caching/back-button glitches -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <title>{% block title %}My App{% endblock %}</title>
+
+  <!-- Bootstrap (optional) -->
+  <link
+    rel="stylesheet"
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+  />
+  <script>
+  window.addEventListener('pageshow', function(event) {
+    // If this page was restored from bfcache (event.persisted === true)
+    // or via Back/Forward navigation (performance.navigation.type === 2),
+    // perform a fresh reload.
+    var nav = window.performance.getEntriesByType('navigation')[0] || {};
+    if (event.persisted || nav.type === 'back_forward') {
+      window.location.reload(true);
+    }
+  });
+  </script>
+  <script>
+   history.pushState(null, document.title, location.href);
+   window.addEventListener('popstate', function (event) {
+     history.pushState(null, document.title, location.href);
+   });
+  </script>
+
+
+
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container">
+      {% block navbar_content %}{% endblock %}
+    </div>
+  </nav>
+
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div
+            class="alert alert-{{ 'danger' if category=='error' else 'success' }} alert-dismissible fade show"
+            role="alert"
+          >
+            {{ msg }}
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+
+  <!-- Optional JS for Bootstrap -->
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+  {% block javascript %}{% endblock %}
+</body>
+</html>

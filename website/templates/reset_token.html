@@ -1,0 +1,60 @@
+{% extends "base_no_nav.html" %}
+{% block title %}新しいパスワード{% endblock %}
+{% block content %}
+
+<center>
+
+<form method="POST">
+  {{ form.hidden_tag() }}
+  <h3 align="center">新しいパスワード</h3>
+
+  <div class="form-group" style="width: 300px;">
+    {{ form.password.label(class="form-label") }}
+    {% if form.password.errors %}
+      {{ form.password(class="form-control is-invalid") }}
+      <div class="invalid-feedback">
+        {% for error in form.password.errors %}
+          <span>{{ error }}</span>
+        {% endfor %}
+      </div>
+    {% else %}
+      {{ form.password(class="form-control") }}
+    {% endif %}
+  </div>
+
+  <div class="form-group" style="margin-top: 10px; width: 300px;">
+    {{ form.confirm_password.label(class="form-label") }}
+    {% if form.confirm_password.errors %}
+      {{ form.confirm_password(class="form-control is-invalid") }}
+      <div class="invalid-feedback">
+        {% for error in form.confirm_password.errors %}
+          <span>{{ error }}</span>
+        {% endfor %}
+      </div>
+    {% else %}
+      {{ form.confirm_password(class="form-control") }}
+    {% endif %}
+  </div>
+
+  <div style="margin-top: 15px;">
+    {{ form.submit(class="btn btn-primary") }}
+  </div>
+
+  <a href="{{ url_for('auth.login') }}" style="display: block; margin-top: 10px;">戻る</a>
+
+</form>
+</center>
+
+<script>
+document.getElementById('confirm_password').addEventListener('input', function() {
+    const password = document.getElementById('password').value;
+    const confirmPassword = this.value;
+    if (password !== confirmPassword) {
+        this.setCustomValidity("パスワードが合ってません");
+    } else {
+        this.setCustomValidity("");
+    }
+});
+</script>
+
+{% endblock %}

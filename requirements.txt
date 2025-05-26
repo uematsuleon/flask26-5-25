@@ -1,0 +1,6 @@
+flask
+Flask-SQLAlchemy
+flask-login
+flask-bcrypt
+flask-session
+flask-wtf

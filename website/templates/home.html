@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block navbar_content %}
+  {% if current_user.is_authenticated %}
+    <div class="navbar-nav">
+      <a class="nav-item nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+
+
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+  <h1 class="text-center">{{ current_user.first_name }}さん、こんにちは</h1>
+
+  <ul class="list-group my-4">
+    {% for note in current_user.notes %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        {{ note.data }}
+        <button class="btn btn-sm btn-danger" onclick="deleteNote({{ note.id }})">&times;</button>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <form method="POST">
+    <textarea name="note" class="form-control mb-2" placeholder="New note…"></textarea>
+    <button type="submit" class="btn btn-primary">Add Note</button>
+  </form>
+{% endblock %}
+
+{% block javascript %}
+  {{ super() }}
+  <script>
+    function deleteNote(id) {
+      fetch("/delete-note", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ noteId: id })
+      }).then(() => location.reload());
+    }
+  </script>
+{% endblock %}
