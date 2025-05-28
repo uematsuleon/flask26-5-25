@@ -4,3 +4,6 @@ flask-login
 flask-bcrypt
 flask-session
 flask-wtf
+pymysql 
+mysql-connector
+pymysql
