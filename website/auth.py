@@ -141,14 +141,24 @@ def sign_up():
 def confirm_email():
     form = ConfirmEmailForm()
     temp_user = session.get('temp_user')
-    count = 0
+    count = session.get('verify_fail_count', 0)
+
     if not temp_user:
         flash("セッションの有効期限が切れました。", 'error')
         return redirect(url_for('auth.sign_up'))
 
-    if form.validate_on_submit():
-        print(str(form.code.data))
-        if form.verify.data and str(form.code.data) == str(temp_user['code']):
+    # Resend button pressed
+    if request.method == 'POST' and 'resend' in request.form:
+        new_code = f"{random.randint(100000, 999999)}"
+        temp_user['code'] = new_code
+        session['temp_user'] = temp_user
+        send_six_digit(temp_user['email'], new_code)
+        flash("確認コードを再送信しました。", 'success')
+        return redirect(url_for('auth.confirm_email'))  # Refresh page to clear POST
+
+    # Verify button pressed
+    if form.validate_on_submit() and 'verify' in request.form:
+        if str(form.code.data) == str(temp_user['code']):
             try:
                 new_user = User(
                     email=temp_user['email'],
@@ -159,26 +169,19 @@ def confirm_email():
                 db.session.commit()
                 login_user(new_user, remember=True)
                 session.pop('temp_user', None)
+                session.pop('verify_fail_count', None)
                 flash("メール確認完了！ログインしました。", 'success')
-                count = 0
                 return redirect(url_for('views.home'))
             except Exception as e:
                 db.session.rollback()
                 flash("エラーが発生しました。", 'error')
-        elif form.verify.data and str(form.code.data) != str(temp_user['code']):
+        else:
             flash("コードが合ってません。", 'error')
-            count +=1
-            if count ==4:
-                count =0
+            count += 1
+            session['verify_fail_count'] = count
+            if count >= 4:
+                session.pop('verify_fail_count', None)
                 return redirect(url_for('auth.login'))
-
-
-        elif form.resend.data:
-            new_code = f"{random.randint(100000, 999999)}"
-            temp_user['code'] = new_code
-            session['temp_user'] = temp_user
-            send_six_digit(temp_user['email'], new_code)
-            flash("確認コードを再送信しました。", 'success')
 
     return render_template("confirm_email.html", user=current_user, form=form)
 
@@ -211,7 +214,12 @@ def reset_token(token):
             user.password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
             db.session.commit()
             flash('パスワードが更新されました。', 'success')
-            return redirect(url_for('auth.login'))
+            login_user(user, remember=True)
+
+            flash("メール確認完了！ログインしました。", 'success')
+            count = 0
+            return redirect(url_for('views.home'))
+
         except Exception as e:
             db.session.rollback()
             flash('エラーが発生しました。', 'error')

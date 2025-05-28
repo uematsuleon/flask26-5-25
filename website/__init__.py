@@ -6,6 +6,7 @@ from flask_session import Session
 from datetime import timedelta
 from functools import wraps
 from os import path
+import mysql.connector
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -30,6 +31,10 @@ def create_app():
     # Basic Config
     app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+    #app.config['SQLALCHEMY_DATABASE_URI'] = ('mysql+mysqlconnector://admin:adminadmin!@database-3.cbc8us2ac0hr.ap-northeast-1.rds.amazonaws.com/test_db')
+
+    #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
     app.config["SESSION_PERMANENT"] = False
     app.config["SESSION_TYPE"] = "filesystem"
     app.config.update(
@@ -54,7 +59,7 @@ def create_app():
     app.register_blueprint(auth, url_prefix='/auth')
 
     # Models
-    from .models import User, Note
+    from .models import User
     with app.app_context():
         db.create_all()
 
@@ -77,9 +82,10 @@ def create_app():
     def add_security_headers(response):
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private'
         response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
+        response.headers['Expires'] = '-1'
         response.headers['X-Frame-Options'] = 'DENY'
         response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.cache_control.no_store = True
         return response
 
     # Optional: error handler

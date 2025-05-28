@@ -9,17 +9,6 @@ from sqlalchemy.sql import func
 from . import db
 
 
-class Note(db.Model):
-    __tablename__ = 'notes'
-
-    id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(Text, nullable=False)
-    date = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-
-    user = db.relationship('User', back_populates='notes')
-
-
 class Verification(db.Model):
     __tablename__ = 'verifications'
 
@@ -46,11 +35,7 @@ class User(db.Model, UserMixin):
     #last_reset_request = db.Column(db.DateTime, nullable=True)  # Add this line
     #reset_token_used = db.Column(db.Boolean, default=False) # Add this line
 
-    notes = db.relationship(
-        'Note',
-        back_populates='user',
-        cascade='all, delete-orphan'
-    )
+
     verification = db.relationship(
         'Verification',
         back_populates='user',
@@ -68,5 +53,10 @@ class User(db.Model, UserMixin):
         try:
             data = serializer.loads(token, max_age=expires_sec)
         except Exception:
+            return None
+        user_id = data.get('user_id')
+        if user_id:
+            return User.query.get(data.get('user_id'))
+        else:
             return None
 
