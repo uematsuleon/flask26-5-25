@@ -5,9 +5,5 @@ flask-bcrypt
 flask-session
 flask-wtf
 pymysql
-functools
-datetime
-os
 wtforms
-os
 itsdangerous
