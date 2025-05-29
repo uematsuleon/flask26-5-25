@@ -6,7 +6,7 @@ from flask_session import Session
 from datetime import timedelta
 from functools import wraps
 from os import path
-import mysql.connector
+
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -30,10 +30,15 @@ def create_app():
 
     # Basic Config
     app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+    #app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+    username = 'admin'
+    password = 'Mangaka123'
+    host = 'flask-database.ckryy2esii2u.us-east-1.rds.amazonaws.com'
+    port = 3306
+    database = 'flask'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{username}:{password}@{host}:{port}/{database}'
     #app.config['SQLALCHEMY_DATABASE_URI'] = ('mysql+mysqlconnector://admin:adminadmin!@database-3.cbc8us2ac0hr.ap-northeast-1.rds.amazonaws.com/test_db')
-
-    #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     app.config["SESSION_PERMANENT"] = False
     app.config["SESSION_TYPE"] = "filesystem"

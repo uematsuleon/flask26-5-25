@@ -119,10 +119,14 @@ def sign_up():
         user = User.query.filter_by(email=email).first()
         if user:
             flash('メールは既に使われています。', 'error')
-        elif len(email) < 4 or len(first_name) < 2 or len(password1) < 7:
-            flash('入力内容に誤りがあります。', 'error')
+        elif len(email) < 4 :
+            flash('メールが短いです。', 'error')
+        elif len(first_name) <2:
+            flash('ユーザーネームが短い。','error')
+        elif len(password1) < 7:
+            flash('パスワードが弱いです。８桁以上で書いて下さい。','error')
         elif password1 != password2:
-            flash('パスワードが一致しません。', 'error')
+            flash('パスワードが一致していません。', 'error')
         else:
             code = f"{random.randint(100000, 999999)}"
             session['temp_user'] = {
