@@ -37,7 +37,6 @@ def create_app():
     port = 3306
     database = 'flask'
     app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{username}:{password}@{host}:{port}/{database}'
-    #app.config['SQLALCHEMY_DATABASE_URI'] = ('mysql+mysqlconnector://admin:adminadmin!@database-3.cbc8us2ac0hr.ap-northeast-1.rds.amazonaws.com/test_db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     app.config["SESSION_PERMANENT"] = False
