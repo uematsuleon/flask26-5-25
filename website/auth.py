@@ -57,13 +57,13 @@ def send_email(subject, body, recipient_email):
         server.sendmail(sender_email, recipient_email, msg.as_string())
 
 def send_six_digit(email, code):
-    body = f"Please type this code:\n{code}\n\nIf you did not request this, ignore this message."
-    send_email("6 digit code", body, email)
+    body = f"コード:\n{code}\n\n"
+    send_email("６桁のコード：メールの確認", body, email)
 
 def send_reset_email(user):
     token = user.get_reset_token()
     reset_url = url_for('auth.reset_token', token=token, _external=True)
-    body = f"To reset your password, visit the following link:\n{reset_url}\n\nIf you didn't request this, ignore this email."
+    body = f"パスワードを更新するために、このリンクから link:\n{reset_url}\n\n　もし、パスワードリセットを希望しなかった場合は、このメールを無視して下さい。"
     send_email("Password Reset Request", body, user.email)
 
 # ------------------ Routes ------------------
@@ -84,7 +84,12 @@ def login():
             login_user(user, remember=False)
             #session['user_id'] = user.id
             return redirect(url_for('views.home'))
-        flash('メールアドレスかパスワードが間違っています。', 'error')
+        elif len(email) ==0:
+            flash('メールアドレスを入力して下さい','error')
+        elif len(password) ==0:
+            flash('パスワードを入力して下さい','error')
+        else:
+            flash('メールアドレスかパスワードが間違っています。', 'error')
 
     return render_template("login.html", user=current_user)
 
@@ -92,16 +97,12 @@ def login():
 @login_required
 def logout():
     logout_user()
-    print("logout_user() called")
     session.clear()
-    print("session.clear() called")
     response = make_response(redirect(url_for('auth.login')))
-    print(f"Redirecting to: {url_for('auth.login')}")
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
     response.set_cookie('session', '', expires=0)
-    print("Response headers set")
     flash('ログアウトしました', 'success')
     return response
 
@@ -118,7 +119,15 @@ def sign_up():
 
         user = User.query.filter_by(email=email).first()
         if user:
-            flash('メールは既に使われています。', 'error')
+            flash('既存ユーザーです。ログインして下さい。', 'error')
+        elif len(email) ==0:
+            flash('メールアドレスを入力して下さい','error')
+        elif len(first_name) ==0:
+            flash('ユーザーネームを入力して下さい','error')
+        elif len(password1) ==0:
+            flash('パスワードを入力してください','error')
+        elif len(password2) ==0:
+            flash('パスワード確認を入力して下さい','error')
         elif len(email) < 4 :
             flash('メールが短いです。', 'error')
         elif len(first_name) <2:
@@ -157,7 +166,7 @@ def confirm_email():
         temp_user['code'] = new_code
         session['temp_user'] = temp_user
         send_six_digit(temp_user['email'], new_code)
-        flash("確認コードを再送信しました。", 'success')
+        flash("画面に、uematsuleon@gmail.comからメールが送られています。また、SPAM Folder を確認してください", 'success')
         return redirect(url_for('auth.confirm_email'))  # Refresh page to clear POST
 
     # Verify button pressed

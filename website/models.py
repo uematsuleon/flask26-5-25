@@ -48,7 +48,7 @@ class User(db.Model, UserMixin):
         return serializer.dumps({'user_id': self.id})
 
     @staticmethod
-    def verify_reset_token(token: str, expires_sec: int =600):
+    def verify_reset_token(token: str, expires_sec: int =180):
         serializer = Serializer(current_app.config['SECRET_KEY'])
         try:
             data = serializer.loads(token, max_age=expires_sec)

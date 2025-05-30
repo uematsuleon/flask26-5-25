@@ -16,6 +16,8 @@
         name="email"
         placeholder="abcd@gmail.com"
         style="max-width:300px;"
+        required
+        value = "{{ email or '' }}"
       />
     </div>
 
@@ -28,6 +30,8 @@
         name="firstName"
         placeholder="ユーザーネーム"
         style="max-width:300px;"
+        required
+        value = '{{ firstName or '' }}'
       />
     </div>
 
@@ -57,5 +61,6 @@
 
     <button type="submit" class="btn btn-primary">確認</button>
   </form>
+ <a href="{{ url_for('auth.login') }}" style="display: block; margin-top: 10px;">戻る</a>
  </center>
 {% endblock %}
