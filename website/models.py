@@ -1,11 +1,9 @@
 from datetime import datetime, timedelta
-
 from flask import current_app
 from flask_login import UserMixin
 from itsdangerous import URLSafeTimedSerializer as Serializer
 from sqlalchemy import Text
 from sqlalchemy.sql import func
-
 from . import db
 
 
@@ -32,9 +30,6 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
     first_name = db.Column(db.String(150), nullable=False)
-    #last_reset_request = db.Column(db.DateTime, nullable=True)  # Add this line
-    #reset_token_used = db.Column(db.Boolean, default=False) # Add this line
-
 
     verification = db.relationship(
         'Verification',
