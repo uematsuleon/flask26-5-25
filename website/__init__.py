@@ -28,9 +28,9 @@ def no_cache(view):
 def create_app():
     app = Flask(__name__)
 
-    # Basic Config
+    
     app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
-    #app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+    
     username = 'admin'
     password = 'Mangaka123'
     host = 'flask-database.ckryy2esii2u.us-east-1.rds.amazonaws.com'
@@ -51,7 +51,7 @@ def create_app():
         REMEMBER_COOKIE_DURATION=timedelta(days=14)
     )
 
-    # Initialize extensions
+    
     db.init_app(app)
     bcrypt.init_app(app)
     Session(app)
@@ -62,12 +62,12 @@ def create_app():
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/auth')
 
-    # Models
+    
     from .models import User
     with app.app_context():
         db.create_all()
 
-    # Login manager
+    
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
@@ -92,7 +92,7 @@ def create_app():
         response.cache_control.no_store = True
         return response
 
-    # Optional: error handler
+    
     @app.errorhandler(404)
     def page_not_found(e):
         return "<h1>404 - Page Not Found</h1>", 404
