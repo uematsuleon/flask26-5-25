@@ -1,23 +1,19 @@
-# Standard libraries
+
 import random
 from datetime import datetime, timedelta
 from functools import wraps
 import smtplib
 from email.mime.text import MIMEText
-
-# Third-party
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session, make_response
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-
-# Local
 from . import db
 from .models import User
 from .forms import ResetPasswordForm, ConfirmEmailForm
 
 auth = Blueprint('auth', __name__)
 
-# ------------------ Utility Decorators ------------------
+
 
 def no_cache(view):
     @wraps(view)
@@ -28,23 +24,12 @@ def no_cache(view):
         response.headers['Expires'] = '0'
         return response
     return wrapped
-'''
-def redirect_if_logged_in(view):
-    @wraps(view)
-    def wrapped(*args, **kwargs):
-        if current_user.is_authenticated:
-            return redirect(url_for('views.home'))
-        return view(*args, **kwargs)
-    return wrapped
-'''
-
-# ------------------ Utility Functions ------------------
 
 def send_email(subject, body, recipient_email):
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
     sender_email = "uematsuleon@gmail.com"
-    sender_password = "gvyy mtur zvys hoki"  # Note: Use environment variable or app password in production!
+    sender_password = "gvyy mtur zvys hoki" 
 
     msg = MIMEText(body)
     msg["Subject"] = subject
@@ -66,7 +51,7 @@ def send_reset_email(user):
     body = f"パスワードを更新するために、このリンクから link:\n{reset_url}\n\n　もし、パスワードリセットを希望しなかった場合は、このメールを無視して下さい。"
     send_email("Password Reset Request", body, user.email)
 
-# ------------------ Routes ------------------
+
 
 @auth.route('/')
 def auth_index():
@@ -82,7 +67,7 @@ def login():
         if user and check_password_hash(user.password, password):
             flash('ログイン成功', 'success')
             login_user(user, remember=False)
-            #session['user_id'] = user.id
+            
             return redirect(url_for('views.home'))
         elif len(email) ==0:
             flash('メールアドレスを入力して下さい','error')
@@ -160,16 +145,15 @@ def confirm_email():
         flash("セッションの有効期限が切れました。", 'error')
         return redirect(url_for('auth.sign_up'))
 
-    # Resend button pressed
     if request.method == 'POST' and 'resend' in request.form:
         new_code = f"{random.randint(100000, 999999)}"
         temp_user['code'] = new_code
         session['temp_user'] = temp_user
         send_six_digit(temp_user['email'], new_code)
         flash("画面に、uematsuleon@gmail.comからメールが送られています。また、SPAM Folder を確認してください", 'success')
-        return redirect(url_for('auth.confirm_email'))  # Refresh page to clear POST
+        return redirect(url_for('auth.confirm_email'))
 
-    # Verify button pressed
+    
     if form.validate_on_submit() and 'verify' in request.form:
         if str(form.code.data) == str(temp_user['code']):
             try:
